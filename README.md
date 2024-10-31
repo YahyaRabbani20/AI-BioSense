@@ -1,10 +1,10 @@
 # GlucoseSense-Clustering-and-Deep-Learning-Optimized-ssDNA-SWCNT-Nano-Biosensors
-![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)
-![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
-![DOI](https://zenodo.org/badge/DOI_NUMBER.svg)
-![RDKit](https://img.shields.io/badge/RDKit-supported-brightgreen)
 ![Python](https://img.shields.io/badge/python-3.x-blue.svg)
-![PyTorch](https://img.shields.io/badge/PyTorch-1.x-%23ee4c2c)
+![NumPy](https://img.shields.io/badge/numpy-supported-blue)
+![MAFFT](https://img.shields.io/badge/MAFFT-clustering-orange)
+![ViennaRNA](https://img.shields.io/badge/ViennaRNA-RNAfold-brightgreen)
+![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-FF6F00)
+![DOI](https://zenodo.org/badge/DOI_NUMBER.svg)
 
 
 ![Overview](images/Picture1.png)
