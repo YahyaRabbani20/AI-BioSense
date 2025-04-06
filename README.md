@@ -45,7 +45,7 @@ Our pipeline combines **unsupervised clustering**, **deep neural networks**, and
 ---
 
 ## Disclaimer  
-*Figure shown here is based on preliminary and overall results presented at [Biomedical Photonics Network, Switzerland, 2024] and is linked to EP Patent Application No. **EP24211885.9**. All rights reserved by the authors and affiliated institutions.*
+*Figure shown here is based on preliminary and overall results presented at Biomedical Photonics Network, Switzerland, 2024 and is linked to EP Patent Application No. **EP24211885.9**. All rights reserved by the authors and affiliated institutions.*
 
 ---
 
