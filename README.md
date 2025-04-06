@@ -7,7 +7,7 @@
 ![DOI](https://zenodo.org/badge/DOI_NUMBER.svg)
 
 
-![Graphical Abstract](images/Graphical Abstract.jpg)
+![GraphicalAbstract](images/GraphicalAbstract.jpg)
 
 # 🚀 Machine Learning-Optimized ssDNA-SWCNT Nano-Biosensors for Glucose Detection
 
