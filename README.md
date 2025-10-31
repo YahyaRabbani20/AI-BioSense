@@ -4,7 +4,7 @@
 ![MAFFT](https://img.shields.io/badge/MAFFT-clustering-orange)
 ![ViennaRNA](https://img.shields.io/badge/ViennaRNA-RNAfold-brightgreen)
 ![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-FF6F00)
-![DOI](https://zenodo.org/badge/DOI_NUMBER.svg)
+![DOI](https://doi.org/10.1101/2025.05.06.652529)
 
 
 ![GraphicalAbstract](images/GraphicalAbstract.jpg)
