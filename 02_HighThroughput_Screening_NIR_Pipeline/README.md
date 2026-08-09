@@ -105,7 +105,7 @@ Raw well spectra contain overlapping emission from several chiralities at once, 
 
 Fit residuals are kept and inspected. A poor fit is itself a data-quality signal — wells that fail fitting are flagged rather than silently averaged into the result.
 
-Implementation: [`PL_Preprocessing_Deconvolution/`](./PL_Preprocessing_Deconvolution)
+Implementation: [`PL_Preprocessing_Deconvolution/`](./PL_Deconvolution_PL_Preprocessing)
 
 ---
 
@@ -132,7 +132,7 @@ Implementation: [`Response_Extraction/`](./Response_Extraction)
 
 | Folder | Contents |
 |---|---|
-| [`PL_Preprocessing_Deconvolution/`](./PL_Preprocessing_Deconvolution) | Background correction, Savitzky-Golay smoothing, wavelength-channel segmentation, and Lorentzian peak deconvolution for the 655 nm and 735 nm channels |
+| [`PL_Preprocessing_Deconvolution/`](./PL_Deconvolution_PL_Preprocessing) | Background correction, Savitzky-Golay smoothing, wavelength-channel segmentation, and Lorentzian peak deconvolution for the 655 nm and 735 nm channels |
 | [`Response_Extraction/`](./Response_Extraction) | ΔI/I₀ and Δλ computation per chirality against paired blanks, replicate statistics, and export of the ML-ready response table |
 
 ---
