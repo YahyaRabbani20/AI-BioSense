@@ -8,39 +8,90 @@ This stage asks a different question from the models in [`03_Deep_Learning_Respo
 Screening results  →  Composition · position · k-mer analysis  →  Motif rules  →  Generated library
 ```
 
-The analysis is deliberately interpretable. A neural network can rank a sequence without explaining it; the statistics here produce human-readable rules — *which nucleotide at which position*, *which k-mers*, *what GC content* — that guided sequence design and can be reported directly in the paper.
+The analysis is deliberately interpretable. A neural network can rank a sequence without explaining it; the statistics here produce human-readable rules — *which nucleotide at which position*, *which k-mers*, *what GC content* — that guided sequence design and can be reported directly.
 
 All analyses target the two chiralities that showed significant glucose response in screening: **(7,6)** and **(9,4)**.
 
 ---
 
-## Analyses
+## Methodology
 
-**Screening-round visualization.** Intensity change and wavelength shift per sequence for the first screening round and the subsequent mutation round, including the effect of sequence length and box/scatter distributions across mutants.
+The goal is to recognize patterns in the DNA library by analyzing nucleotide proportions, positions, and k-mer frequencies, identifying motifs relevant to the functional and structural properties of the sequences.
 
-**Nucleotide proportion analysis.** Proportion of each base (A, T, G, C) per sequence plotted against measured response, testing whether overall base composition alone carries signal.
+### Nucleotide proportions
 
-**GC / AT content.** GC and AT content against response for each chirality — a coarser compositional descriptor than per-base proportion, and one directly tied to duplex stability and stacking behaviour.
+For each sequence *S*, the proportion of each nucleotide *N* ∈ {A, C, G, T} characterizes its composition:
 
-**Position analysis.** The core method. For every position *j* and nucleotide *b*, the mean response across all sequences carrying *b* at *j* is computed, producing intensity-response matrices `I₇₆(j,b)` and `I₉₄(j,b)`. These are rendered as heatmaps and as 3D surfaces (position × nucleotide × mean response), revealing positions where a specific base is consistently associated with elevated response.
+```
+P(N) = count(N) / length(S)
+```
 
-**K-mer analysis.** K-mer frequency across the library related to mean response, with elbow-method selection and clustering to separate high-response from low-response k-mer groups.
+where `count(N)` is the number of occurrences of *N* in *S*. Mean intensity per sequence is then computed and grouped by nucleotide proportion, giving the average signal intensity associated with different compositions.
+
+### AT and GC content
+
+Coarser compositional descriptors, obtained by summing the relevant proportions:
+
+```
+AT content = P(A) + P(T)
+GC content = P(G) + P(C)
+```
+
+### Position analysis
+
+This step resolves how the *position* of a nucleotide within a sequence influences response, rather than composition alone.
+
+Given sequences `S = {DNA₁, DNA₂, …, DNAₙ}` with corresponding intensity responses `R = {R₁, R₂, …, Rₙ}`, each sequence's response is first **normalized by its length**:
+
+```
+r_ij = R_i / length(S_i)
+```
+
+where `r_ij` is the normalized response attributed to the *j*-th nucleotide of the *i*-th sequence. Length normalization matters here because the library spans multiple sequence lengths — without it, longer sequences would contribute disproportionately to positional averages.
+
+Normalized responses are then aggregated across all sequences and averaged per nucleotide per position:
+
+```
+μ_jb = (1 / m_jb) · Σ r_ij   over all sequences carrying base b at position j
+```
+
+where `μ_jb` is the mean normalized response for nucleotide *b* at position *j*, and `m_jb` is the number of times *b* appears at position *j* across the library.
+
+These values populate a matrix **M**, with `M_jb = μ_jb`, rendered as a heatmap (and as 3D surfaces of position × nucleotide × response) to expose positional hotspots — positions where a particular base is consistently associated with elevated response. Separate matrices are built for (7,6) and (9,4).
+
+### K-mer analysis
+
+Each sequence is decomposed into **overlapping** k-mers of length *k*. For *k* = 3, the sequence `AGCTGGTTC` yields `AGC`, `GCT`, `CTG`, and so on.
+
+Frequency is the count of each k-mer across the whole library:
+
+```
+F(kmer) = count(kmer)
+```
+
+and the mean intensity response per k-mer is computed over all sequences containing it:
+
+```
+μ_kmer = mean(R) over sequences containing kmer
+```
+
+K-mers exhibiting **both high frequency and high response** are selected as the most effective in the dataset. This joint criterion is why the analysis plots frequency against mean response and applies elbow-method clustering — a high-response k-mer seen only once is not actionable evidence.
 
 ---
 
 ## Sequence generation
 
-The positional matrices are used directly to construct a new library, implemented in `Position and prediction_Glucose.py`:
+The positional matrices drive construction of a new library, implemented in `Position and prediction_Glucose.py`:
 
 1. For each position, take the **top-two responding nucleotides** in `I₇₆` and in `I₉₄` independently
-2. Where those two sets **intersect**, sample from the common bases — favouring nucleotides that perform well for *both* chiralities
+2. Where those sets **intersect**, sample from the common bases — favouring nucleotides that perform well for *both* chiralities
 3. Where they don't intersect, fall back to the single best-responding base from each matrix and sample between them
 4. Sequence length is drawn randomly between **8 and 14** nucleotides
 5. Each generated sequence is scored by summing its positional responses across both matrices
 
-The result is exported as a ranked candidate library (`sequences_with_High.xlsx`), which is then passed to the trained ensemble in [`03_Deep_Learning_Response_Prediction/`](../03_Deep_Learning_Response_Prediction) for scoring, and the top predictions returned to [`02_HighThroughput_Screening_NIR_Pipeline/`](../02_HighThroughput_Screening_NIR_Pipeline) for experimental validation.
+The ranked library is exported to `sequences_with_High.xlsx`, passed to the trained ensemble in [`03_Deep_Learning_Response_Prediction/`](../03_Deep_Learning_Response_Prediction) for scoring, and the top predictions returned to [`02_HighThroughput_Screening_NIR_Pipeline/`](../02_HighThroughput_Screening_NIR_Pipeline) for experimental validation.
 
-High-response k-mers identified in the k-mer analysis are likewise recombined at high frequency to build sequences of varying length, providing a second, independent generation route.
+High-response k-mers identified above provide a second, independent generation route: they are recombined at high frequency to build sequences of varying length, retaining the properties observed in the high-response k-mers.
 
 ---
 
@@ -70,7 +121,7 @@ Scripts expect the following files in the working directory:
 | `First Round.xlsx` (incl. sheet `lengths effect`) | First-round visualization scripts |
 | `Mutation Round.xlsx` | Mutation-round visualization |
 
-Expected columns in the main dataset: DNA sequence, `(7,6) Intensity`, `(9,4) Intensity`, and the corresponding peak-shift columns. Note that several scripts address columns by integer index (`df.iloc[...]`) rather than by name, so column order must be preserved.
+Expected columns in the main dataset: `DNA`, `(7,6) Intensity`, `(9,4) Intensity`, and the corresponding peak-shift columns. Several scripts address columns by integer index (`df.iloc[...]`) rather than by name, so column order must be preserved.
 
 ---
 
@@ -78,15 +129,15 @@ Expected columns in the main dataset: DNA sequence, `(7,6) Intensity`, `(9,4) In
 
 Figures are written to the working directory at 900 dpi: nucleotide proportion plots, GC/AT content plots, positional heatmaps for both chiralities, 3D response surfaces, k-mer frequency/response scatter and elbow plots, and per-round intensity and shift plots.
 
-The generated sequence library is written to `sequences_with_High.xlsx` with each sequence's summed positional response for both chiralities.
+The generated sequence library is written to `sequences_with_High.xlsx`, with each sequence's summed positional response for both chiralities.
 
 ---
 
 ## Notes
 
-- Generation draws from a set, so the export order varies between runs; the sequences and their scores are unaffected.
-- The generation loop is bounded by an attempt counter as well as a target count, so the number of unique sequences produced depends on how much the constrained alphabet at each position limits the reachable space.
-- `Position and prediction_Glucose.py` wraps position indices with a modulo when a generated sequence is longer than the positional matrix, so positional preferences repeat cyclically beyond the matrix length.
+- Generation draws from a set, so export order varies between runs; the sequences and their scores are unaffected.
+- The generation loop is bounded by an attempt counter as well as a target count, so the number of unique sequences produced depends on how much the constrained per-position alphabet limits the reachable space.
+- When a generated sequence exceeds the length of the positional matrix, position indices wrap by modulo, so positional preferences repeat cyclically.
 
 ---
 
