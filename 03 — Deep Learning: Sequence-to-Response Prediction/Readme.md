@@ -1,12 +1,3 @@
-03_Deep_Learning_Response_Prediction/
-├── README.md
-├── Data_Preprocessing/            # label binarization, class balancing, encoding
-├── CNN/                           # one-hot (5-eye) encoding + convolutional model
-├── GNN/                           # Graph2Vec k-mer graph embeddings + dense network
-├── GCN/                           # k-mer adjacency graph + graph convolutional layers
-├── Hyperparameter_Optimization/   # Optuna studies, k-fold configuration
-├── Evaluation/                    # confusion matrix, ROC/AUC, metric reporting
-└── Prediction_and_Screening/      # majority voting, ~100k library scoring
 
 # 03 — Deep Learning: Sequence-to-Response Prediction
 
